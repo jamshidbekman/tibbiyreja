@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tibbiy Rejalashtirgich</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <i class="fa-solid fa-hospital-user"></i>
+                <h1>Tibbiy Rejalashtirgich</h1>
+            </div>
+            <p>Tibbiy tashrif jadvallarini oson va aniq yarating.</p>
+        </header>
+
+        <main>
+            <section class="card upload-section">
+                <h2>1. Faylni Yuklash</h2>
+                <div class="file-drop-area" id="drop-area">
+                    <span class="file-msg">Excel faylni shu yerga tashlang yoki</span>
+                    <input type="file" id="fileElem" accept=".xlsx, .xls">
+                    <button class="btn btn-secondary" onclick="document.getElementById('fileElem').click()">Faylni
+                        Tanlash</button>
+                    <div id="file-name" class="file-name"></div>
+                </div>
+            </section>
+
+            <section class="card settings-section">
+                <h2>2. Umumiy Sozlamalar</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Rejalashtirilayotgan Yil</label>
+                        <input type="number" id="targetYear" value="2026">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label class="switch">
+                            <input type="checkbox" id="saturdayWorking">
+                            <span class="slider round"></span>
+                        </label>
+                        <span>Shanba ish kunimi?</span>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Bayram kunlari (YYYY-MM-DD, vergul bilan) <br> 2026-yil uchun bayram kunlari joylashtirilgan.
+                        Tekshirib chiqishini unutmang!</label>
+                    <textarea id="holidays"
+                        placeholder="masalan: 2026-01-01, 2026-03-08, 2026-03-21">2026-01-01, 2026-01-02, 2026-01-03, 2026-01-04, 2026-03-08, 2026-03-09, 2026-03-19, 2026-03-20, 2026-03-21, 2026-03-22, 2026-03-23, 2026-05-08, 2026-05-09, 2026-05-10, 2026-05-11, 2026-05-26, 2026-05-27, 2026-05-28, 2026-05-29, 2026-09-01, 2026-09-30, 2026-10-01, 2026-12-07, 2026-12-08, 2026-12-31</textarea>
+                </div>
+            </section>
+
+            <section class="card ranges-section">
+                <div class="section-header">
+                    <h2>3. Yillik Oraliqlar va Sonlar</h2>
+                    <button class="btn btn-primary btn-sm" id="addRangeBtn"><i class="fa-solid fa-plus"></i> Oraliq
+                        qo'shish</button>
+                </div>
+                <div id="ranges-container">
+                    <!-- Dynamic Ranges will appear here -->
+                </div>
+            </section>
+
+            <div class="actions">
+                <button class="btn btn-success btn-lg" id="generateBtn">
+                    <i class="fa-solid fa-gears"></i> Jadvalni Yaratish
+                </button>
+            </div>
+
+            <div id="result-area" class="result-area hidden">
+                <div class="success-message">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <h3>Muvaffaqiyatli!</h3>
+                    <p>Jadvalingiz tayyor bo'ldi.</p>
+                    <a href="#" id="downloadLink" class="btn btn-primary">Zip Faylni Yuklash</a>
+                </div>
+            </div>
+            <div id="loading-area" class="loading-area hidden">
+                <div class="spinner"></div>
+                <p>Jarayonda...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Template for Range Item -->
+    <template id="range-template">
+        <div class="range-item">
+            <div class="range-header">
+                <h3>Oraliq #<span class="range-index"></span></h3>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="font-size: 0.85rem; color: #666;">Tashriflar:</label>
+                    <select class="visit-count" style="padding: 4px; border-radius: 4px; border: 1px solid #ddd;">
+                        <option value="1" selected>1 ta</option>
+                        <option value="2">2 ta</option>
+                        <option value="3">3 ta</option>
+                        <option value="4">4 ta</option>
+                        <option value="12">12 ta (Har oy)</option>
+                    </select>
+
+                    <label style="font-size: 0.85rem; color: #666; margin-left: 10px;">Jins:</label>
+                    <select class="gender-select" style="padding: 4px; border-radius: 4px; border: 1px solid #ddd;">
+                        <option value="all">Barchasi</option>
+                        <option value="male">Erkaklar</option>
+                        <option value="female">Ayollar</option>
+                    </select>
+
+                    <div class="birthday-option hidden"
+                        style="display: flex; align-items: center; gap: 5px; margin-left: 10px;">
+                        <input type="checkbox" class="use-birthday" id="useBirthday">
+                        <label for="useBirthday" style="font-size: 0.85rem; cursor: pointer;">Tug'ilgan kunga
+                            qo'yish</label>
+                    </div>
+
+                    <button class="btn-icon delete-range"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+            <div class="range-inputs">
+                <div class="year-inputs">
+                    <div class="form-group">
+                        <label>Boshlanish Yili</label>
+                        <input type="number" class="start-year" placeholder="2021">
+                    </div>
+                    <div class="form-group">
+                        <label>Tugash Yili</label>
+                        <input type="number" class="end-year" placeholder="2024">
+                    </div>
+                </div>
+                <div class="months-grid">
+                    <!-- Jan - Dec inputs -->
+                    <div class="month-input"><label>Yanvar</label><input type="number" class="m-0" value="0"></div>
+                    <div class="month-input"><label>Fevral</label><input type="number" class="m-1" value="0"></div>
+                    <div class="month-input"><label>Mart</label><input type="number" class="m-2" value="0"></div>
+                    <div class="month-input"><label>Aprel</label><input type="number" class="m-3" value="0"></div>
+                    <div class="month-input"><label>May</label><input type="number" class="m-4" value="0"></div>
+                    <div class="month-input"><label>Iyun</label><input type="number" class="m-5" value="0"></div>
+                    <div class="month-input"><label>Iyul</label><input type="number" class="m-6" value="0"></div>
+                    <div class="month-input"><label>Avgust</label><input type="number" class="m-7" value="0"></div>
+                    <div class="month-input"><label>Sentabr</label><input type="number" class="m-8" value="0"></div>
+                    <div class="month-input"><label>Oktabr</label><input type="number" class="m-9" value="0"></div>
+                    <div class="month-input"><label>Noyabr</label><input type="number" class="m-10" value="0"></div>
+                    <div class="month-input"><label>Dekabr</label><input type="number" class="m-11" value="0"></div>
+                </div>
+                <button type="button" class="btn btn-secondary distribute-btn"
+                    style="width: 100%; margin-top: 10px; padding: 8px; background: #e0e7ff; color: #4338ca; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                    <i class="fa-solid fa-calculator"></i> Avtomatik Taqsimlash
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js?v=2"></script>
+</body>
+
+</html>
